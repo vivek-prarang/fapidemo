@@ -1,13 +1,19 @@
-import mysql.connector
-def connect_to_mysql():
-  try:
-    connection = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="fapi"
-    )
-  except mysql.connector.Error as err:   
-    return None  
 
-  return connection
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from ...config.settings import DATABASE_URL
+
+
+# Create engine for database connection
+engine = create_engine(DATABASE_URL)
+
+# Create SessionLocal class for database session
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Dependency function to get database session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
